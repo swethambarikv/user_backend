@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const AdminController = require('../controllers/admin-controller');
+const {isAuthenticateAdmin} = require('../middleware/authentication')
 
 router.get('/', AdminController.getAdmin);
-router.get('/:id', AdminController.getAdminId);
-router.post('/', AdminController.addAdmin);
-router.put('/:id', AdminController.updateAdmin);
-router.delete('/:id', AdminController.deleteAdmin);
-
+router.post('/register',AdminController.registerAdmin)
+router.post('/login', AdminController.loginAdmin)
+router.get('/my-profile/:id',  AdminController.viewProfile)
+router.put('/:id',  AdminController.updateProfile)
+router.delete('/:id',  AdminController.deleteProfile)
 
 module.exports = router;

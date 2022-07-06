@@ -28,12 +28,12 @@ class UserController {
         }
     }
 
-    static loginUser = async (req, res, next) => {
+    static loginUser = async (req, res) => {
         try {
             const { email, password } = req.body;
             let user = await User.findOne({ email: email })
-            console.log("user : "+user)
-            if (!user)                               
+            console.log("user : " + user)
+            if (!user)
                 throw "No account exist with this mail id"
             if (!(bcrypt.compareSync(password, user.password)))
                 throw "Incorrect password, correct it"
@@ -45,7 +45,7 @@ class UserController {
         }
     }
 
-    static viewProfile = async (req, res, next) => {
+    static viewProfile = async (req, res) => {
         try {
             let user
             const id = req.params.id;
@@ -62,7 +62,7 @@ class UserController {
         }
     }
 
-    static updateProfile = async (req, res, next) => {
+    static updateProfile = async (req, res) => {
         try {
             let user
             let id = req.params.id;
@@ -91,7 +91,7 @@ class UserController {
         }
     }
 
-    static deleteProfile = async (req, res, next) => {
+    static deleteProfile = async (req, res) => {
         try {
             let user
             let id = req.params.id
@@ -102,11 +102,11 @@ class UserController {
 
             if (user === null)
                 throw "Id not found, Unable to delete"
-            
-            return res.status(200).json({message: "User deleted sucessfully"})
+
+            return res.status(200).json({ message: "User deleted sucessfully" })
         }
         catch (err) {
-            return res.status(404).json({error: err})
+            return res.status(404).json({ error: err })
         }
     }
 

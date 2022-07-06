@@ -13,6 +13,8 @@ const sendToken = (user, statusCode, res, message) => {
         user,
         token
     })
+   
+    
 }
 
 module.exports = sendToken;
