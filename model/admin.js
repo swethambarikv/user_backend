@@ -17,7 +17,7 @@ const adminSchema = new schema({
         type: String,
         required: true,
     },
-    mobile: {
+    phone: {
         type: String,
         required: true,
     },
@@ -25,10 +25,16 @@ const adminSchema = new schema({
         type: String,
         required: true,
     },
-    password: {
-        type: String,
-        required: true,
+    password:{
+        type:String,
+        required:true
+    },
+    role:{
+        type: mongoose.Types.ObjectId,
+        ref: 'role',
+        required: false,
     }
+   
 });
 adminSchema.methods.generateJsonWebToken = function () {
     console.log("IN Admin schema : " + process.env.SECRET_KEY)

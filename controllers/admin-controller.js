@@ -5,18 +5,18 @@ const sendToken = require('../utils/jwt-token')
 class AdminController {
     static registerAdmin = async (req, res) => {
         try {
-            const { name, email, gender, phone, practice, password } = req.body;
+            const { name, email, gender, phone, topic, password } = req.body;
             if (await admin.findOne({ email: email })) {
+                console.log("Admin Register")
                 throw "This mail id has already been registered"
             }
-            const hashedPassword = await bcrypt.hash(password, 10)
             let admin = new Admin({
                 name,
                 email,
                 gender,
                 phone,
-                practice,
-                password: hashedPassword
+                topic,
+                password
             });
             await admin.save();
             const message = "Admin Registered Successfully"
@@ -65,7 +65,7 @@ class AdminController {
         try {
             let admin
             let id = req.params.id;
-            const { name, email, gender, phone, practice, password } = req.body;
+            const { name, email, gender, phone, topic, password } = req.body;
 
             if (id.length !== 24)
                 throw "Invalid object Id"
@@ -79,7 +79,7 @@ class AdminController {
                 email,
                 gender,
                 phone,
-                practice,
+                topic,
                 password: hashedPassword
             })
             await admin.save()

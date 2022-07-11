@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
+const role = require('./role')
 
 const schema = mongoose.Schema;
 
@@ -15,25 +16,31 @@ const userSchema = new schema({
     },
     gender: {
         type: String,
-        required: true,
+        required: false,
     },
     phone: {
         type: String,
-        required: true,
+        required: false,
     },
-    practice: {
+    topic: {
         type: String,
-        required: true,
+        required: false,
     },
     password: {
         type: String,
         required: false,
+    },
+    role: {
+        type: mongoose.Types.ObjectId,
+        ref: 'role',
+        required: false,
     }
+    
 });
 
 userSchema.methods.generateJsonWebToken = function(){
     console.log("IN User schema : "+process.env.SECRET_KEY)
-    return jwt.sign({id:this._id},process.env.SECRET_KEY,{
+    return jwt.sign({id:this._id},"swetha27gmail",{
         expiresIn:'5m',
     });
 }

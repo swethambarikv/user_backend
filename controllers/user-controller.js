@@ -1,23 +1,31 @@
 const User = require('../model/user');
 const bcrypt = require('bcrypt');
 const sendToken = require('../utils/jwt-token')
+const Role = require('../model/role');
 
 class UserController {
 
     static registerUser = async (req, res) => {
         try {
-            const { name, email, gender, phone, practice, password } = req.body;
+            console.log("In regs user");
+            const { name, email, gender, phone, topic, password, role } = req.body;
+            console.log(req.body)
             if (await User.findOne({ email: email })) {
                 throw "This mail id has already been registered"
             }
-            const hashedPassword = await bcrypt.hash(password, 10)
+            console.log("Role : ", role)
+            let roleId = await Role.findOne({ roleType: role })
+            roleId._id.toString();
+            console.log("Role Id : ", roleId)
+
             let user = new User({
                 name,
                 email,
                 gender,
                 phone,
-                practice,
-                password: hashedPassword
+                topic,
+                password,
+                role: roleId
             });
             await user.save();
             const message = "User Registered Successfully"
@@ -30,7 +38,14 @@ class UserController {
 
     static loginUser = async (req, res) => {
         try {
-            const { email, password } = req.body;
+            const { email, password, role } = req.body;
+            const getRole = await Role.findOne({roleType: role})._id
+            // if() {
+
+            }
+            catch(err){
+
+            }
             let user = await User.findOne({ email: email })
             console.log("user : " + user)
             if (!user)
@@ -43,7 +58,7 @@ class UserController {
         catch (err) {
             return res.status(404).json({ error: err })
         }
-    }
+        
 
     static viewProfile = async (req, res) => {
         try {
@@ -66,7 +81,7 @@ class UserController {
         try {
             let user
             let id = req.params.id;
-            const { name, email, gender, phone, practice, password } = req.body;
+            const { name, email, gender, phone, topic, password } = req.body;
 
             if (id.length !== 24)
                 throw "Invalid object Id"
@@ -80,7 +95,7 @@ class UserController {
                 email,
                 gender,
                 phone,
-                practice,
+                topic,
                 password: hashedPassword
             })
             await user.save()
@@ -121,6 +136,34 @@ class UserController {
             return res.status(404).json({ error: err })
         }
     }
+// static getUserById=async(req,res)=>{
+
+//    User.find({_id:req.body.params._id},(err,docs)=>{
+//     if(!err){   
+//         doc=docs[0];
+//         res.status(200).send({doc});
+//     }
+//     else{
+//         console.log("Error in user ID: "+JSON.stringify(err,stringify,2));
+//         res.status(401).json({message:'Error in user id retrival'})
+//     }
+//    })
+// }
+
+static getUserById = async (req, res) => {
+
+    
+    
+    const user = User.findById(req.params.id, (err, doc) => {
+    
+    if (!user) { res.status(400).json({ message: "error in get by id user " }) }
+    
+    else { res.send(doc); }
+    
+    });
+    
+    };
 }
+
 
 module.exports = UserController;
