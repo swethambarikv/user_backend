@@ -28,20 +28,21 @@ const userSchema = new schema({
     },
     password: {
         type: String,
-        required: false,
+        required: true,
     },
     role: {
+        // type: String
         type: mongoose.Types.ObjectId,
         ref: 'role',
         required: false,
     }
-    
+
 });
 
-userSchema.methods.generateJsonWebToken = function(){
-    console.log("IN User schema : "+process.env.SECRET_KEY)
-    return jwt.sign({id:this._id},"swetha27gmail",{
-        expiresIn:'5m',
+userSchema.methods.generateJsonWebToken = function() {
+    console.log("IN User schema : " + process.env.SECRET_KEY)
+    return jwt.sign({ id: this._id }, "swetha27gmail", {
+        expiresIn: '5m',
     });
 }
 

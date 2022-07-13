@@ -5,16 +5,18 @@ const Role = require('../model/role');
 
 class UserController {
 
-    static registerUser = async (req, res) => {
+    static registerUser = async(req, res) => {
         try {
             console.log("In regs user");
             const { name, email, gender, phone, topic, password, role } = req.body;
-            console.log(req.body)
+            console.log("in req body:" + Object.values(req.body))
             if (await User.findOne({ email: email })) {
                 throw "This mail id has already been registered"
             }
             console.log("Role : ", role)
-            let roleId = await Role.findOne({ roleType: role })
+            let roleId;
+            roleId = await Role.findOne({ roleType: role })
+            console.log(roleId)
             roleId._id.toString();
             console.log("Role Id : ", roleId)
 
@@ -30,54 +32,53 @@ class UserController {
             await user.save();
             const message = "User Registered Successfully"
             sendToken(user, 200, res, message)
-        }
-        catch (err) {
+        } catch (err) {
             return res.status(400).json({ error: err })
         }
     }
 
-    static loginUser = async (req, res) => {
+    static loginUser = async(req, res) => {
         try {
+            console.log("hiii");
+            console.log(req.body)
             const { email, password, role } = req.body;
-            const getRole = await Role.findOne({roleType: role})._id
-            // if() {
-
-            }
-            catch(err){
-
-            }
+            const getRole = await User.findOne({ roleType: role })
+            console.log("ROLE ID : ", getRole._id)
+            if (!getRole._id === role)
+                throw "This user don't have access to this type of role"
             let user = await User.findOne({ email: email })
             console.log("user : " + user)
-            if (!user)
+            if (!user) {
+                console.log("No account exist")
                 throw "No account exist with this mail id"
-            if (!(bcrypt.compareSync(password, user.password)))
-                throw "Incorrect password, correct it"
+            }
+            // if (!(bcrypt.compareSync(password, user.password)))
+            //     throw "Incorrect password, correct it"
             const message = "Successfully Login"
             sendToken(user, 200, res, message)
-        }
-        catch (err) {
+        } catch (err) {
             return res.status(404).json({ error: err })
         }
-        
+    }
 
-    static viewProfile = async (req, res) => {
+
+    static viewProfile = async(req, res) => {
         try {
             let user
             const id = req.params.id;
 
-            if (id.length !== 24)  //
+            if (id.length !== 24) //
                 throw "Invalid Object Id"
             user = await User.findById(id)
             if (!user)
                 throw "User not found"
             return res.status(200).json({ user })
-        }
-        catch (err) {
+        } catch (err) {
             return res.status(404).json({ error: err })
         }
     }
 
-    static updateProfile = async (req, res) => {
+    static updateProfile = async(req, res) => {
         try {
             let user
             let id = req.params.id;
@@ -100,13 +101,12 @@ class UserController {
             })
             await user.save()
             return res.status(200).json({ message: "User update successfully" })
-        }
-        catch (err) {
+        } catch (err) {
             return res.status(404).json({ error: err })
         }
     }
 
-    static deleteProfile = async (req, res) => {
+    static deleteProfile = async(req, res) => {
         try {
             let user
             let id = req.params.id
@@ -119,49 +119,46 @@ class UserController {
                 throw "Id not found, Unable to delete"
 
             return res.status(200).json({ message: "User deleted sucessfully" })
-        }
-        catch (err) {
+        } catch (err) {
             return res.status(404).json({ error: err })
         }
     }
 
-    static getUser = async (req, res) => {
-        try {
-            const users = await User.find();
-            if (users.length < 1)
-                throw "No user found"
-            return res.status(200).json({ users })
+    static getUser = async(req, res) => {
+            try {
+                const users = await User.find();
+                console.log(users)
+                if (users.length < 1)
+                    throw "No user found"
+                return res.status(200).json({ users })
+            } catch (err) {
+                return res.status(404).json({ error: err })
+            }
         }
-        catch (err) {
-            return res.status(404).json({ error: err })
-        }
-    }
-// static getUserById=async(req,res)=>{
+        // static getUserById=async(req,res)=>{
 
-//    User.find({_id:req.body.params._id},(err,docs)=>{
-//     if(!err){   
-//         doc=docs[0];
-//         res.status(200).send({doc});
-//     }
-//     else{
-//         console.log("Error in user ID: "+JSON.stringify(err,stringify,2));
-//         res.status(401).json({message:'Error in user id retrival'})
-//     }
-//    })
-// }
+    //    User.find({_id:req.body.params._id},(err,docs)=>{
+    //     if(!err){   
+    //         doc=docs[0];
+    //         res.status(200).send({doc});
+    //     }
+    //     else{
+    //         console.log("Error in user ID: "+JSON.stringify(err,stringify,2));
+    //         res.status(401).json({message:'Error in user id retrival'})
+    //     }
+    //    })
+    // }
 
-static getUserById = async (req, res) => {
+    static getUserById = async(req, res) => {
 
-    
-    
-    const user = User.findById(req.params.id, (err, doc) => {
-    
-    if (!user) { res.status(400).json({ message: "error in get by id user " }) }
-    
-    else { res.send(doc); }
-    
-    });
-    
+
+
+        const user = User.findById(req.params.id, (err, doc) => {
+
+            if (!user) { res.status(400).json({ message: "error in get by id user " }) } else { res.send(doc); }
+
+        });
+
     };
 }
 
