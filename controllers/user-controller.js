@@ -52,8 +52,6 @@ class UserController {
                 console.log("No account exist")
                 throw "No account exist with this mail id"
             }
-            // if (!(bcrypt.compareSync(password, user.password)))
-            //     throw "Incorrect password, correct it"
             const message = "Successfully Login"
             sendToken(user, 200, res, message)
         } catch (err) {
@@ -125,16 +123,33 @@ class UserController {
     }
 
     static getUser = async(req, res) => {
-            try {
-                const users = await User.find();
-                console.log(users)
-                if (users.length < 1)
-                    throw "No user found"
-                return res.status(200).json({ users })
-            } catch (err) {
-                return res.status(404).json({ error: err })
-            }
+        try {
+            const role = await Role.findOne({ roleType: "user"})
+            console.log("ROlE : ", role._id)
+            const users = await User.find({role: role._id});
+            console.log(users)
+            if (users.length < 1)
+                throw "No user found"
+            return res.status(200).json({ users })
+        } catch (err) {
+            return res.status(404).json({ error: err })
         }
+    }
+
+    static getAdmin = async(req, res) => {
+        try {
+            console.log("GET Admin")
+            const role = await Role.findOne({roleType: "admin"})
+            console.log("ROLE : ", role._id)
+            const admin = await User.find({role: role._id})
+            if (admin.length < 1)
+            throw "No user found"
+            return res.status(200).json({ admin })
+        }
+        catch (err) {
+            return res.status(400).json({eror: err})
+        }
+    }
         // static getUserById=async(req,res)=>{
 
     //    User.find({_id:req.body.params._id},(err,docs)=>{
@@ -150,8 +165,6 @@ class UserController {
     // }
 
     static getUserById = async(req, res) => {
-
-
 
         const user = User.findById(req.params.id, (err, doc) => {
 

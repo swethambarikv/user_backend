@@ -3,8 +3,9 @@ const router = express.Router();
 const UserController = require('../controllers/user-controller');
 const { isAuthenticateUser } = require('../middleware/authentication')
 
-router.get('/', UserController.getUser);
+router.get('/user-table', UserController.getUser);
 router.get('/:id', UserController.getUserById)
+router.get('/', UserController.getAdmin)
 router.post('/register', UserController.registerUser)
 router.post('/login', UserController.loginUser)
 router.get('/my-profile/:id', UserController.viewProfile)
