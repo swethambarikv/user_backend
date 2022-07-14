@@ -6,6 +6,7 @@ class AdminController {
     static registerAdmin = async (req, res) => {
         try {
             const { name, email, gender, phone, topic, password } = req.body;
+            console.log("User Regis : ", req.body)
             if (await admin.findOne({ email: email })) {
                 console.log("Admin Register")
                 throw "This mail id has already been registered"
@@ -18,7 +19,7 @@ class AdminController {
                 topic,
                 password
             });
-            await admin.save();
+            // await admin.save();
             const message = "Admin Registered Successfully"
             sendToken(admin, 200, res, message)
         }
@@ -73,14 +74,14 @@ class AdminController {
 
             if (!admin)
                 throw "Unable to update this profile"
-            const hashedPassword = await bcrypt.hash(password, 10)
+            // const hashedPassword = await bcrypt.hash(password, 10)
             admin = await Admin.findByIdAndUpdate(id, {
                 name,
                 email,
                 gender,
                 phone,
                 topic,
-                password: hashedPassword
+                password
             })
             await admin.save()
             return res.status(200).json({ message: "Admin update successfully" })

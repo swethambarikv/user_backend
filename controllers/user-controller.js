@@ -9,7 +9,7 @@ class UserController {
         try {
             console.log("In regs user");
             const { name, email, gender, phone, topic, password, role } = req.body;
-            console.log("in req body:" + Object.values(req.body))
+            console.log("in req body:" + name)
             if (await User.findOne({ email: email })) {
                 throw "This mail id has already been registered"
             }
@@ -88,14 +88,14 @@ class UserController {
 
             if (!user)
                 throw "Unable to update this profile"
-            const hashedPassword = await bcrypt.hash(password, 10)
+            // const hashedPassword = await bcrypt.hash(password, 10)
             user = await User.findByIdAndUpdate(id, {
                 name,
                 email,
                 gender,
                 phone,
                 topic,
-                password: hashedPassword
+                password
             })
             await user.save()
             return res.status(200).json({ message: "User update successfully" })
@@ -126,7 +126,9 @@ class UserController {
         try {
             const role = await Role.findOne({ roleType: "user"})
             console.log("ROlE : ", role._id)
-            const users = await User.find({role: role._id});
+            const users = await User.find({role: role._id})
+            // let roleType = await users.populate({path: 'role'})
+            
             console.log(users)
             if (users.length < 1)
                 throw "No user found"
@@ -142,6 +144,7 @@ class UserController {
             const role = await Role.findOne({roleType: "admin"})
             console.log("ROLE : ", role._id)
             const admin = await User.find({role: role._id})
+            console.log("Role : ", admin);
             if (admin.length < 1)
             throw "No user found"
             return res.status(200).json({ admin })
@@ -174,6 +177,6 @@ class UserController {
 
     };
 }
-
+        
 
 module.exports = UserController;
