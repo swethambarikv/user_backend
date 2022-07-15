@@ -1,5 +1,7 @@
 const Role = require('../model/role')
 const sendToken = require('../utils/jwt-token')
+var ObjectId = require('mongoose').Types.ObjectId;
+
 
 class RoleController {
 
@@ -19,9 +21,11 @@ class RoleController {
         try {
             console.log("in comming role body : ", req.body[0])
             
-            if(await Role.findOne({roleType: req.body[0]})){
+            if(await Role.findOne({roleType: req.body[0]}))
+            {
                 console.log("In duplicate role");
-              throw "Role alreday exist"}
+              throw "Role alreday exist"
+            }
             let roleVale = new Role({
                 roleType:req.body[0]
             }) 
@@ -39,6 +43,43 @@ static getRoleById=async(req,res)=>{
             res.status(400).json({message:"error in role id controller"})
         }
     });
+}
+static updateRole=async(req,res)=>{
+//     try{
+// let role;
+// let id=req.params.id;
+// const roleUpdate=req.body;
+//     }
+//     catch(error){
+
+//     }
+
+console.log("BTS")
+
+console.log(req.params.id);
+
+console.log(req.body[0]);
+
+if(!ObjectId.isValid(req.params.id))
+
+return res.status(400).send(`No record with the given id : $(req.params.id)`);
+
+var role={
+
+roleType : req.body[0],
+};
+
+Role.findByIdAndUpdate(req.params.id,{$set:role},{new:true},(err,data)=>{
+
+if(!err)
+
+res.status(200).json({msg:'Updated Successfully'})
+
+else
+
+console.log('Error in Role Update : '+JSON.stringify(err,undefined,2));
+
+});
 }
     // static postRole=async(req,res)=>{
     //     try{
@@ -63,6 +104,27 @@ static getRoleById=async(req,res)=>{
     //         return res.status(404).json({error:err})
     //     }
     // }
+
+
+    static deleteRole = async (req,res)=>{
+
+        if(!ObjectId.isValid(req.params.id))
+        
+        return res.status(400).send(`No record with the given id : $(req.params.id)`);
+        
+        Role.findByIdAndRemove(req.params.id,(err,data)=>{
+        
+        if(!err)
+        
+        res.status(200).json({msg:'Deleted Successfully'})
+        
+        else
+        
+        console.log('Error in Material Delete : '+JSON.stringify(err,undefined,2));
+        
+        });
+        
+        }
 }
 
 module.exports = RoleController;
