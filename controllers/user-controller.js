@@ -9,13 +9,14 @@ class UserController {
         try {
             console.log("In regs user");
             const { name, email, gender, phone, topic, password, role } = req.body;
-            console.log("in req body:" + name)
+            console.log("in req body:" + req.body.email)
             if (await User.findOne({ email: email })) {
+                console.log("already available");
                 throw "This mail id has already been registered"
             }
-            console.log("Role : ", role)
+            console.log("Role : ", req.body.role)
             let roleId;
-            roleId = await Role.findOne({ roleType: role })
+            roleId = await Role.findOne({ roleType: req.body.role })
             console.log(roleId)
             roleId._id.toString();
             console.log("Role Id : ", roleId)
@@ -124,12 +125,13 @@ class UserController {
 
     static getUser = async(req, res) => {
         try {
-            const role = await Role.findOne({ roleType: "user"})
+            console.log("IN GET USER ")
+            const role = await Role.findOne({ roleType: "admin"})
             console.log("ROlE : ", role._id)
-            const users = await User.find({role: role._id})
+            const users = await User.find({role: {$nin : role._id}}).populate({path: 'role'})
             // let roleType = await users.populate({path: 'role'})
             
-            console.log(users)
+            console.log("Except admin : "+users)
             if (users.length < 1)
                 throw "No user found"
             return res.status(200).json({ users })

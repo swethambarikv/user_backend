@@ -6,6 +6,7 @@ var ObjectId = require('mongoose').Types.ObjectId;
 class RoleController {
 
     static getRole = async (req, res) => {
+        console.log(req.body);
         try {
             const role = await Role.find()
             if(!role)

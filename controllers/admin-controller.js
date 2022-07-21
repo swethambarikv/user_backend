@@ -5,9 +5,9 @@ const sendToken = require('../utils/jwt-token')
 class AdminController {
     static registerAdmin = async (req, res) => {
         try {
-            const { name, email, gender, phone, topic, password } = req.body;
+            const { name, email, gender, phone, topic, password, role } = req.body;
             console.log("User Regis : ", req.body)
-            if (await admin.findOne({ email: email })) {
+            if (await admin.findOne({ email: req.body.email })) {
                 console.log("Admin Register")
                 throw "This mail id has already been registered"
             }
@@ -17,7 +17,8 @@ class AdminController {
                 gender,
                 phone,
                 topic,
-                password
+                password,
+                role
             });
             // await admin.save();
             const message = "Admin Registered Successfully"
