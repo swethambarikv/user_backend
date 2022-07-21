@@ -5,21 +5,14 @@ const Role = require('../model/role');
 
 class UserController {
 
-    static registerUser = async(req, res) => {
+    static registerUser = async (req, res) => {
         try {
-            console.log("In regs user");
             const { name, email, gender, phone, topic, password, role } = req.body;
-            console.log("in req body:" + req.body.email)
             if (await User.findOne({ email: email })) {
-                console.log("already available");
                 throw "This mail id has already been registered"
             }
-            console.log("Role : ", req.body.role)
             let roleId;
-            roleId = await Role.findOne({ roleType: req.body.role })
-            console.log(roleId)
-            roleId._id.toString();
-            console.log("Role Id : ", roleId)
+            roleId = await Role.findOne({ roleType: role })
 
             let user = new User({
                 name,
@@ -32,16 +25,14 @@ class UserController {
             });
             await user.save();
             const message = "User Registered Successfully"
-            sendToken(user, 200, res, message)
+            return res.status(200).json({ message: message })
         } catch (err) {
             return res.status(400).json({ error: err })
         }
     }
 
-    static loginUser = async(req, res) => {
+    static loginUser = async (req, res) => {
         try {
-            console.log("hiii");
-            console.log(req.body)
             const { email, password, role } = req.body;
             const getRole = await User.findOne({ roleType: role })
             console.log("ROLE ID : ", getRole._id)
@@ -60,24 +51,7 @@ class UserController {
         }
     }
 
-
-    static viewProfile = async(req, res) => {
-        try {
-            let user
-            const id = req.params.id;
-
-            if (id.length !== 24) //
-                throw "Invalid Object Id"
-            user = await User.findById(id)
-            if (!user)
-                throw "User not found"
-            return res.status(200).json({ user })
-        } catch (err) {
-            return res.status(404).json({ error: err })
-        }
-    }
-
-    static updateProfile = async(req, res) => {
+    static updateProfile = async (req, res) => {
         try {
             let user
             let id = req.params.id;
@@ -89,7 +63,6 @@ class UserController {
 
             if (!user)
                 throw "Unable to update this profile"
-            // const hashedPassword = await bcrypt.hash(password, 10)
             user = await User.findByIdAndUpdate(id, {
                 name,
                 email,
@@ -105,10 +78,11 @@ class UserController {
         }
     }
 
-    static deleteProfile = async(req, res) => {
+    static deleteProfile = async (req, res) => {
         try {
             let user
             let id = req.params.id
+            console.log("delete ");
 
             if (id.length !== 24)
                 throw "Invalid object Id"
@@ -123,15 +97,10 @@ class UserController {
         }
     }
 
-    static getUser = async(req, res) => {
+    static getUser = async (req, res) => {
         try {
-            console.log("IN GET USER ")
-            const role = await Role.findOne({ roleType: "admin"})
-            console.log("ROlE : ", role._id)
-            const users = await User.find({role: {$nin : role._id}}).populate({path: 'role'})
-            // let roleType = await users.populate({path: 'role'})
-            
-            console.log("Except admin : "+users)
+            const role = await Role.findOne({ roleType: "admin" })
+            const users = await User.find({ role: { $nin: role._id } }).populate({ path: 'role' })
             if (users.length < 1)
                 throw "No user found"
             return res.status(200).json({ users })
@@ -140,45 +109,41 @@ class UserController {
         }
     }
 
-    static getAdmin = async(req, res) => {
+    static getAdmin = async (req, res) => {
         try {
-            console.log("GET Admin")
-            const role = await Role.findOne({roleType: "admin"})
+            const role = await Role.findOne({ roleType: "admin" })
             console.log("ROLE : ", role._id)
-            const admin = await User.find({role: role._id})
+            const admin = await User.find({ role: role._id })
             console.log("Role : ", admin);
             if (admin.length < 1)
-            throw "No user found"
+                throw "No user found"
             return res.status(200).json({ admin })
         }
         catch (err) {
-            return res.status(400).json({eror: err})
+            return res.status(400).json({ eror: err })
         }
     }
-        // static getUserById=async(req,res)=>{
-
-    //    User.find({_id:req.body.params._id},(err,docs)=>{
-    //     if(!err){   
-    //         doc=docs[0];
-    //         res.status(200).send({doc});
-    //     }
-    //     else{
-    //         console.log("Error in user ID: "+JSON.stringify(err,stringify,2));
-    //         res.status(401).json({message:'Error in user id retrival'})
-    //     }
-    //    })
-    // }
-
-    static getUserById = async(req, res) => {
+    static getUserById = async (req, res) => {
 
         const user = User.findById(req.params.id, (err, doc) => {
 
-            if (!user) { res.status(400).json({ message: "error in get by id user " }) } else { res.send(doc); }
+            if (!user) {
+                res.status(400).json({ message: "error in get by id user " })
+            } else {
+                res.send(doc);
+            }
 
         });
 
     };
-}
-        
+    static getUserRole = async (req, res) => {
+        console.log(req.params.id)
+        const user = Role.findById(req.params.id, (err, doc) => {
+            console.log(doc)
+            if (!user) { res.status(400).json({ message: "error in get by id user " }) } else { res.send(doc); }
+        })
+    }
 
+
+}
 module.exports = UserController;

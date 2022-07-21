@@ -3,7 +3,7 @@ const sendToken = (user, statusCode, res, message) => {
     console.log("token : ", token);
     const option = {
         expires: new Date(
-            Date.now() + 5 * 60 * 1000
+            Date.now() + 120 * 60 * 1000
         ),
         httpOnly: true
     }
